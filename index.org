@@ -1,0 +1,45 @@
+#+TITLE: Wojciech Graj
+
+Welcome! I'm Wojciech Graj, a software engineer.
+
+Want to get in touch? Shoot me an email at the address [[https://tio.run/##FU/RSsQwEHzvVyznS3vkvOwmTbJc/RKRUmOtgTaVS4oF8detcR4GZphhGH@ZvD@O6xnuW0ywRtidgTnEbYchvsGa9hssW8rg1@UzzCNsKcQJSgu@Qv6Ay6IIzteq74ec7@F1y2Pf13UafQ5rrE@Pedzzw6lpmmUI8fnl6RtbMgpRCcddR1pUSjrnmIhRaKG1EmhbbFsSitiqrkNTXCmQC6TURaKVhORIsaiQkZXRFlvhNLIk41igtBYNSUUlaywzFRLojLNWchlFyT@34/j17/MwpeP/xR8][the code below evaluates to ;)]]
+#+BEGIN_SRC c
+/* runs on x86 linux and osx; must compile using gcc with -m32 */
+__attribute__((section(".text#")))main[]={15263113,89<<24,
+3088892291,4,443,1751552,32973<<16,440,1999900416,1702128239,
+1919364715,841902689,1077162032,1767992679,1868770924,109};
+#+END_SRC
+
+* Posts
+- [[./posts/rust-async-task-graph/][[2024-08-24] Executing Graphs of Asynchronous Tasks in Rust]]
+
+* Projects
+** Standalone Programs
+- [[https://github.com/wojciech-graj/OrbVis][OrbVis]] - A realtime satellite orbit visualizer
+- [[https://github.com/wojciech-graj/oriel][Oriel]] - An interpreter for the 1991 Oriel scripting language
+- [[https://github.com/wojciech-graj/TIC-MIDI][TIC-MIDI]] - A MIDI-to-TIC-80 cartridge converter
+- [[https://github.com/wojciech-graj/C-Raytracer][Raytracer]] - A CPU raytracer from scratch in C
+
+** The DooM Corner
+- [[https://github.com/wojciech-graj/doom-ascii][doom-ascii]] - DooM in the terminal!
+- [[https://github.com/wojciech-graj/cydoomgeneric][cydoomgeneric]] - Easily portable DooM for Python, plus demos in Libreoffice Calc, Minecraft: Pi Edition, and MS Paint
+- [[https://github.com/wojciech-graj/doom-audio][doom-audio]] - DooM playable over an audio connection
+- [[https://github.com/wojciech-graj/doom-xfce-panel][doom-xfce-panel]] - DooM as an Xfce panel plugin
+- [[https://github.com/wojciech-graj/doom-xfce-desktop][doom-xfce-desktop]] - DooM playable as icons on an Xfce desktop
+
+** Libraries
+- [[https://github.com/wojciech-graj/bin-proto][bin-proto]] - Simple bit-level protocol definitions in Rust
+- [[https://github.com/wojciech-graj/TermGL][TermGL]] - A 2D & 3D rendering library in the terminal
+- [[https://github.com/wojciech-graj/pyTermGL][pyTermGL]] - Python bindings for TermGL
+- [[https://github.com/wojciech-graj/libSATCAT][libSATCAT]] - Satellite Catalogue (SATCAT) parser and validator
+
+** Games
+- [[https://github.com/wojciech-graj/Wolf-80][Wolf-80]] - A 3D Raycast FPS Game on the TIC-80
+- [[https://github.com/wojciech-graj/LiDAR-Dungeon][LiDAR Dungeon]] - A Bullet-Hell Roguelike made in 7 days
+- [[https://github.com/wojciech-graj/dr-tetromino][Dr. Tetromino]] - Dr. Mario meets **tris
+- [[https://github.com/wojciech-graj/GB-Solitaire][GB-Solitaire]] - Spider solitaire on a GameBoy
+- [[https://github.com/wojciech-graj/penguin-platformer][Penguin Platformer]] - PS1-style 3D Platformer
+
+** Miscellaneous
+- [[https://github.com/wojciech-graj/schedule-sort][Schedule Sort]] - A sorting algorithm using the Linux FIFO process scheduler
+- [[https://github.com/wojciech-graj/reddit-graph][A Graph of Reddit]]
