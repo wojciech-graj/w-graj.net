@@ -13,26 +13,30 @@ struct MyStruct {
 #+END_SRC
 
 * Terminology
-Attribute macros consist of a [[https://docs.rs/syn/1.0.109/syn/enum.Meta.html][~Meta~]], which has the following variants: [fn:: For the sake of simplicity, the terminology is based on [[https://crates.io/crates/syn/1.0.109][syn 1.0]] instead of the newer [[https://crates.io/crates/syn][syn 2.0]]. The differences between them are discussed in the subsection about quoting.]
-- [[https://docs.rs/syn/1.0.109/syn/struct.Path.html][~Path~]]: A path, like ~test~ in ~#[test]~.
-- [[https://docs.rs/syn/1.0.109/syn/struct.MetaList.html][~List~]]: A structured list, like ~derive(Debug)~ in ~#[derive(Debug)]~. Each element is [[https://docs.rs/syn/1.0.109/syn/enum.NestedMeta.html][~NestedMeta~]], which is either a [[https://docs.rs/syn/1.0.109/syn/enum.Meta.html][~Meta~]], or a [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]]. [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]] values are discussed in a later section.
-- [[https://docs.rs/syn/1.0.109/syn/struct.MetaNameValue.html][~NameValue~]]: A name-value pair, like ~feature = "..."~ in ~#[cfg(feature = "nightly")]~.
+Attribute macros consist of a [[https://docs.rs/syn/2.0.83/syn/enum.Meta.html][~Meta~]], which has the following variants:
+- [[https://docs.rs/syn/2.0.83/syn/struct.Path.html][~Path~]]: A path, like ~test~ in ~#[test]~.
+- [[https://docs.rs/syn/2.0.83/syn/struct.MetaList.html][~List~]]: A structured list, like ~derive(Debug)~ in ~#[derive(Debug)]~.
+- [[https://docs.rs/syn/2.0.83/syn/struct.MetaNameValue.html][~NameValue~]]: A name-value pair, like ~feature = "..."~ in ~#[cfg(feature = "nightly")]~.
 
 * Style considerations
 ** Namespacing
-Attribute macros lack [[https://en.wikipedia.org/wiki/Namespace][namespacing]], so to avoid two different crates using an attribute with the same name for different purposes, you'll most commonly see attributes contain a list with the crate's name, like ~#[serde(...)]~ for [[https://crates.io/crates/serde][serde]]. However there are some exceptions such as [[https://crates.io/crates/clap][clap]] and [[https://crates.io/crates/thiserror][thiserror]], that both provide multiple non-namespaced attributes. While these crates have gotten away with not doing it, namespacing your attributes not only prevents collisions but also makes code more readable by indicating which crate the attribute pertains to.
+Attribute macros lack [[https://en.wikipedia.org/wiki/Namespace][namespacing]], so to avoid two different crates using an attribute with the same name for different purposes, you'll most commonly see attributes contain a list with the crate's name, like ~#[serde(...)]~ for [[https://crates.io/crates/serde][serde]]. Alternatively, consider using a separate namespace for each trait or struct the attribute pertains to, like ~#[command(...)]~ for [[https://crates.io/crates/clap][clap]]'s [[https://docs.rs/clap/4.5.20/clap/trait.Subcommand.html][~Subcommand~]] trait.
+
+Some crates such as [[https://crates.io/crates/thiserror][thiserror]] don't use namespaces. While these crates have gotten away with not doing it, namespacing your attributes not only prevents collisions but also makes code more readable by indicating which crate the attribute pertains to.
 
 #+BEGIN_SRC rust
-// Namespaced attributes
+// Crate-namespaced attributes
 #[serde(...)] // serde
 #[strum(...)] // strum
 #[prost(...)] // prost
 
+// Trait/struct-namespaced attributes
+#[command(...)] // clap (Subcommand trait)
+#[group(...)] // clap (ArgGroup struct)
+#[arg(...)] // clap (Arg struct)
+#[value(...)] // clap (PossibleValue struct)
+
 // Non-namespaced attributes
-#[command(...)] // clap
-#[group(...)] // clap
-#[arg(...)] // clap
-#[value(...)] // clap
 #[backtrace] // thiserror
 #[error(...)] // thiserror
 #[from] // thiserror
@@ -68,7 +72,7 @@ Most crates allow for multiple settings to be specified in a single attribute.
 #+END_SRC
 
 ** To quote or not to quote
-It is very common for name-value attributes to have a quoted value, such as ~#[serde(serialize_with = "path::to::func"]~. This is because [[https://crates.io/crates/syn/1.0.109][syn 1.0]] required the value to be a [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]], as shown below.
+It is very common for name-value attributes to have a quoted value, such as ~#[serde(serialize_with = "path::to::func"]~. This is because [[https://crates.io/crates/syn/1.0.109][syn 1.0]] required the value to be a [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]], as shown below. [fn:: Technically [[https://crates.io/crates/syn/1.0.109][syn 1.0]] could parse expressions in name-value values, but it was not supported out-of-the-box, and didn't see widespread adoption.]
 
 #+BEGIN_SRC rust
 // Lit variants
@@ -86,7 +90,7 @@ It is very common for name-value attributes to have a quoted value, such as ~#[s
 
 This is problematic because it prevents an attribute's value from being a more complex expression. It is therefore common for the value to be provided as a string ~#[attr(three = "1 + 2")]~.
 
-However, with [[https://crates.io/crates/syn][syn 2.0]], parsing a name-value meta with a non-[[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]] value is now trivial.
+However, with [[https://crates.io/crates/syn][syn 2.0]], the [[https://docs.rs/syn/2.0.83/syn/struct.MetaNameValue.html][~MetaNameValue~]]'s value is an [[https://docs.rs/syn/2.0.83/syn/enum.Expr.html][~Expr~]] instead of a [[https://docs.rs/syn/2.0.83/syn/enum.Lit.html][~Lit~]], making it trivial to parse expression values.
 
 #+BEGIN_SRC rust
 use syn::{parse_quote, Expr, ItemStruct};
@@ -110,14 +114,14 @@ for attr in &input.attrs {
 }
 #+END_SRC
 
-Yet very few crates, have attempted to switch to expressions that aren't wrapped in strings, presumably to preserve as much API backwards-compatibility as possible. However, when designing new crates, it could be a good idea to finally leave this clunky string-wrapping in the past.
+Yet relatively few crates have attempted to switch to expressions that aren't wrapped in strings, presumably to preserve as much API backwards-compatibility as possible. However, when designing new crates or making breaking changes to existing ones, it is a good idea to finally leave this clunky string-wrapping in the past.
 
 * Documentation
 ** Where even are the docs?
 While the documentation for Rust crates is generally excellent, attribute macros have always been a pain point due to the lack of a standardized location for their documentation. Listed below are the most common locations for attribute documentation
-- A separate module ([[https://docs.rs/strum/0.26.3/strum/additional_attributes/index.html][~strum::additional_attributes~]], [[https://docs.rs/clap/4.5.20/clap/_derive/index.html][~clap::_derive~]], [[https://docs.rs/deku/latest/deku/attributes/index.html][~deku::attributes~]]). The lack of a standardized name for this module means that a user has to waste time trying to find where it is.
-- The main documentation page ([[https://docs.rs/thiserror/latest/thiserror/][~thiserror~]], [[https://docs.rs/prost/latest/prost/][~prost~]]). Unless the crate is very simple, this can clutter the page and make things difficult to find.
-- Derive macro documentation ([[https://docs.rs/derive_more/latest/derive_more/derive.Debug.html][~derive_more::Debug~]], [[https://docs.rs/serde_with/latest/serde_with/attr.skip_serializing_none.html][~serde_with::skip_serializing_none~]]). This is typically the best approach for a single macro, however if multiple macros share the same attributes, they'll both have to share the exact same rustdoc unless you copy-paste the same attribute descriptions for each one.
+- A separate module ([[https://docs.rs/strum/0.26.3/strum/additional_attributes/index.html][~strum::additional_attributes~]], [[https://docs.rs/clap/4.5.20/clap/_derive/index.html][~clap::_derive~]], [[https://docs.rs/deku/0.18.1/deku/attributes/index.html][~deku::attributes~]]). The lack of a standardized name for this module means that a user has to spend time searching for the relevant module.
+- The main documentation page ([[https://docs.rs/thiserror/1.0.65/thiserror/][~thiserror~]], [[https://docs.rs/prost/0.13.3/prost/][~prost~]]). Unless the crate is very simple, this can clutter the page and make things difficult to find.
+- Derive macro documentation ([[https://docs.rs/derive_more/1.0.0/derive_more/derive.Debug.html][~derive_more::Debug~]], [[https://docs.rs/serde_with/3.11.0/serde_with/attr.skip_serializing_none.html][~serde_with::skip_serializing_none~]]). This is typically the best approach for a single macro, however if multiple macros share the same attributes, they'll both have to share the exact same rustdoc unless you copy-paste the same attribute descriptions for each one.
 - An external webpage ([[https://serde.rs/attributes.html][serde]]). All rust documentation can be found on [[https://docs.rs/][docs.rs]], so one crate having their documentation elsewhere will /definitely/ not be confusing....
 
 I would advocate for the attributes' documentation being in the derive macro's documentation, unless a large number of them share the same attributes, in which case a separate module would likely be the best choice.
@@ -145,11 +149,11 @@ enum Enum {
 
 * A modest proposal
 I don't claim to have all the answers, and there likely isn't an objectively best way to format attribute macros, but based on the above reasoning and examples I would suggest trying to follow the following guidelines.
-- Utilize namespacing: ~#[crate(...)]~ instead of ~#[...]~.
-- Use each type of meta for its intended purpose: ~#[crate(boolean_toggle)]~, ~#[crate(option = "...")]~, ~#[crate(x = "...", needs_x = "...")]~ ~#[crate(list(a, b, c))]~, ~#[crate(function(arg1, arg2))]~.
-- Allow multiple items in the same attribute: ~#[crate(option1 = "...", option2 = "...")]~.
+- Utilize namespacing: ~#[crate(...)]~, ~#[trait(...)]~, ~#[struct(...)]~ instead of ~#[...]~.
+- Use each type of meta for its intended purpose: ~#[ns(boolean_toggle)]~, ~#[ns(option = "...")]~, ~#[ns(x = "...", needs_x = "...")]~ ~#[ns(list(a, b, c))]~, ~#[ns(function(arg1, arg2))]~.
+- Allow multiple items in the same attribute: ~#[ns(option1 = "...", option2 = "...")]~.
 - Avoid excessive nesting.
-- Don't wrap expressions in strings: ~#[crate(option = f(1, 2) + 3)]~ instead of ~#[crate(option = "f(1, 2) + 3")]~.
+- Don't wrap expressions in strings: ~#[ns(option = f(1, 2) + 3)]~ instead of ~#[ns(option = "f(1, 2) + 3")]~.
 - Standardize documentation locations. Prefer documenting attributes in your derive macro's documentation, or in a separate module.
 - Provide a hyperlink to your attributes' documentation on the main documentation page.
 - Describe what container, variant, and field attributes are, and classify each of your attributes.
@@ -157,7 +161,7 @@ I don't claim to have all the answers, and there likely isn't an objectively bes
 -----
 
 * Annex: A case study on what NOT to do
-My favourite example of attribute macros done wrong is the now abandoned [[https://crates.io/crates/protocol][protocol]] crate, the goal of which was to easily encode and decode data types to and from binary. For the snippet below, you'll find that there is inconsistent naming of ~discriminant~ and ~discriminator~, inconsistent use of name-value and list metas, and ~#[repr(...)]~ is used to specify the type of the discriminant, which also inadvertently forces a specific in-memory layout of the enum which could be less efficient. A pretty impressive score for a whole 7 lines of code.
+My favourite example of attribute macros done wrong is the now abandoned [[https://crates.io/crates/protocol][protocol]] crate, the goal of which was to easily encode and decode data types to and from binary. For the snippet below, you'll find that there is inconsistent naming of ~discriminant~ and ~discriminator~, inconsistent use of name-value and list metas, and ~#[repr(...)]~ is used to specify the type of the discriminant, which also inadvertently forces a specific in-memory layout of the enum which could be less efficient. Not bad for 7 lines of code.
 
 #+BEGIN_SRC rust
 #[derive(Protocol)]
@@ -168,3 +172,9 @@ enum Enum {
     Variant,
 }
 #+END_SRC
+
+* Revision history
+*** 2024-10-23
+- Per [[https://www.reddit.com/r/rust/comments/1gaeel7/comment/ltebmyi/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button][Edward Page's feedback]]:
+  - Discuss struct/trait-based namespacing as an alternative to crate-based namespacing.
+  - Clarify that it wasn't impossible for name-value values to be expressions in syn 1.0.
