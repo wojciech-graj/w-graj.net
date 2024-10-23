@@ -1,0 +1,170 @@
+#+TITLE: Best Practices for Derive Macro Attributes in Rust
+#+DATE: 2024-10-23
+
+Derive macros are one of the many conveniences offered by Rust, allowing automatic code generation tailored to your data types, with additional customization through attributes. While there don't exist any guidelines for how these attributes should look, perhaps because it seems like a trivial matter, I found myself struggling to decide on the most logical way to structure my attribute macros when working on [[https://github.com/wojciech-graj/bin-proto][bin-proto]], and decided that a writeup was necessary. This article will provide an overview of the approaches taken by various crates, with some reasoning about what I would deem the best approach.
+
+#+BEGIN_SRC rust
+#[derive(MyDerive)]
+#[attribute]
+struct MyStruct {
+    #[attribute]
+    field: Type,
+}
+#+END_SRC
+
+* Terminology
+Attribute macros consist of a [[https://docs.rs/syn/1.0.109/syn/enum.Meta.html][~Meta~]], which has the following variants: [fn:: For the sake of simplicity, the terminology is based on [[https://crates.io/crates/syn/1.0.109][syn 1.0]] instead of the newer [[https://crates.io/crates/syn][syn 2.0]]. The differences between them are discussed in the subsection about quoting.]
+- [[https://docs.rs/syn/1.0.109/syn/struct.Path.html][~Path~]]: A path, like ~test~ in ~#[test]~.
+- [[https://docs.rs/syn/1.0.109/syn/struct.MetaList.html][~List~]]: A structured list, like ~derive(Debug)~ in ~#[derive(Debug)]~. Each element is [[https://docs.rs/syn/1.0.109/syn/enum.NestedMeta.html][~NestedMeta~]], which is either a [[https://docs.rs/syn/1.0.109/syn/enum.Meta.html][~Meta~]], or a [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]]. [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]] values are discussed in a later section.
+- [[https://docs.rs/syn/1.0.109/syn/struct.MetaNameValue.html][~NameValue~]]: A name-value pair, like ~feature = "..."~ in ~#[cfg(feature = "nightly")]~.
+
+* Style considerations
+** Namespacing
+Attribute macros lack [[https://en.wikipedia.org/wiki/Namespace][namespacing]], so to avoid two different crates using an attribute with the same name for different purposes, you'll most commonly see attributes contain a list with the crate's name, like ~#[serde(...)]~ for [[https://crates.io/crates/serde][serde]]. However there are some exceptions such as [[https://crates.io/crates/clap][clap]] and [[https://crates.io/crates/thiserror][thiserror]], that both provide multiple non-namespaced attributes. While these crates have gotten away with not doing it, namespacing your attributes not only prevents collisions but also makes code more readable by indicating which crate the attribute pertains to.
+
+#+BEGIN_SRC rust
+// Namespaced attributes
+#[serde(...)] // serde
+#[strum(...)] // strum
+#[prost(...)] // prost
+
+// Non-namespaced attributes
+#[command(...)] // clap
+#[group(...)] // clap
+#[arg(...)] // clap
+#[value(...)] // clap
+#[backtrace] // thiserror
+#[error(...)] // thiserror
+#[from] // thiserror
+#[source] // thiserror
+#+END_SRC
+
+** Contents of the top-level list
+The top-level list needs something within it to be useful. The general consensus is to use paths/literals for simple boolean toggles that are off by default, name-value pairs for settings with one value, and lists for lists of values and functions that are called with arbitrary arguments.
+
+In cases where one setting consists of a fixed number of parts, such as ~content~ relying on ~tag~ being present in ~#[serde(tag = "t", content = "c")]~, they are not grouped together in one meta (~#[serde(tag(tag = "t", content = "c"))]~), thereby maintaining a consistent style but creating the potential for confusion, especially if a setting were to consist of more than two parts.
+
+You will also very seldom see any nesting of metas deeper than what's shown in the examples below.
+
+#+BEGIN_SRC rust
+// Path/Lit: boolean toggle
+#[serde_with(skip_apply)] // Lit: boolean toggle (serde_with)
+#[backtrace] // Path: boolean toggle (thiserror)
+
+// NameValue:
+#[darling(rename = "new_name")] // NameValue: option with arbitrary value (darling)
+#[serde(tag = "t", content = "c")] // NameValue: multiple related values (serde)
+
+// List
+#[value(func_name(args))] // List: arbitrary function with arbitrary arguments (clap)
+#[debug(bounds(X: Clone, Y: Copy))] // List: list of values (derive_more)
+#+END_SRC
+
+Most crates allow for multiple settings to be specified in a single attribute.
+
+#+BEGIN_SRC rust
+// Multiple separate settings in one attribute
+#[serde(serialize_with = "...", deserialize_with = "...")] // serde
+#+END_SRC
+
+** To quote or not to quote
+It is very common for name-value attributes to have a quoted value, such as ~#[serde(serialize_with = "path::to::func"]~. This is because [[https://crates.io/crates/syn/1.0.109][syn 1.0]] required the value to be a [[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]], as shown below.
+
+#+BEGIN_SRC rust
+// Lit variants
+#[attr(
+    name = "char", // Str
+    name = b"char", // ByteStr
+    name = b'c', // Byte
+    name = 'c', // Char
+    name = 1, name = 1u32, // Int
+    name = 1.0, name = 1f32, // Float
+    name = true, // Bool
+    name = literal // Verbatim
+)]
+#+END_SRC
+
+This is problematic because it prevents an attribute's value from being a more complex expression. It is therefore common for the value to be provided as a string ~#[attr(three = "1 + 2")]~.
+
+However, with [[https://crates.io/crates/syn][syn 2.0]], parsing a name-value meta with a non-~Lit~ value is now trivial
+
+#+BEGIN_SRC rust
+use syn::{parse_quote, Expr, ItemStruct};
+
+let input: ItemStruct = parse_quote! {
+    #[attr(name = 4 + 5)]
+    pub struct Struct;
+};
+
+for attr in &input.attrs {
+    if attr.path().is_ident("attr") {
+        attr.parse_nested_meta(|meta| {
+            if meta.path.is_ident("name") {
+                let expr: Expr = meta.value()?.parse()?;
+                println!("{}", quote::quote! { #expr }); // prints "4 + 5"
+            }
+            Ok(())
+        })
+        .unwrap();
+    }
+}
+#+END_SRC
+
+Yet very few crates, have attempted to switch to expressions that aren't wrapped in strings, presumably to preserve as much API backwards-compatibility as possible. However, when designing new crates, it could be a good idea to finally leave this clunky string-wrapping in the past.
+
+* Documentation
+** Where even are the docs?
+While the documentation for Rust crates is generally excellent, attribute macros have always been a pain point due to the lack of a standardized location for their documentation. Listed below are the most common locations for attribute documentation
+- A separate module ([[https://docs.rs/strum/0.26.3/strum/additional_attributes/index.html][~strum::additional_attributes~]], [[https://docs.rs/clap/4.5.20/clap/_derive/index.html][~clap::_derive~]], [[https://docs.rs/deku/latest/deku/attributes/index.html][~deku::attributes~]]). The lack of a standardized name for this module means that a user has to waste time trying to find where it is.
+- The main documentation page ([[https://docs.rs/thiserror/latest/thiserror/][~thiserror~]], [[https://docs.rs/prost/latest/prost/][~prost~]]). Unless the crate is very simple, this can clutter the page and make things difficult to find.
+- Derive macro documentation ([[https://docs.rs/derive_more/latest/derive_more/derive.Debug.html][~derive_more::Debug~]], [[https://docs.rs/serde_with/latest/serde_with/attr.skip_serializing_none.html][~serde_with::skip_serializing_none~]]). This is typically the best approach for a single macro, however if multiple macros share the same attributes, they'll both have to share the exact same rustdoc unless you copy-paste the same attribute descriptions for each one.
+- An external webpage ([[https://serde.rs/attributes.html][serde]]). All rust documentation can be found on [[https://docs.rs/][docs.rs]], so one crate having their documentation elsewhere will /definitely/ not be confusing....
+
+I would advocate for the attributes' documentation being in the derive macro's documentation, unless a large number of them share the same attributes, in which case a separate module would likely be the best choice.
+
+#+BEGIN_SRC rust
+/// shared docs for both macros
+pub use derives::{Derive1, Derive2};
+#+END_SRC
+
+Because of the lack of standardization, the main documentation page should, and typically does, contain a hyperlink to the attribute documentation regardless of where it is located.
+
+** Container, variant, and field attributes
+Almost always, attributes will be split into the three categories shown below, and it's best to specify to which of these an attribute can apply. Additionally, it's common for some variant of the below code to be present to clarify which category of attribute goes where.
+
+#+BEGIN_SRC rust
+#[container_attribute]
+enum Enum {
+    #[variant_attribute]
+    Variant {
+        #[field_attribute]
+        field: Type,
+    }
+}
+#+END_SRC
+
+* A modest proposal
+I don't claim to have all the answers, and there likely isn't an objectively best way to format attribute macros, but based on the above reasoning and examples I would suggest trying to follow the following guidelines.
+- Utilize namespacing: ~#[crate(...)]~ instead of ~#[...]~.
+- Use each type of meta for its intended purpose: ~#[crate(boolean_toggle)]~, ~#[crate(option = "...")]~, ~#[crate(x = "...", needs_x = "...")]~ ~#[crate(list(a, b, c))]~, ~#[crate(function(arg1, arg2))]~.
+- Allow multiple items in the same attribute: ~#[crate(option1 = "...", option2 = "...")]~.
+- Avoid excessive nesting.
+- Don't wrap expressions in strings: ~#[crate(option = f(1, 2) + 3)]~ instead of ~#[crate(option = "f(1, 2) + 3")]~.
+- Standardize documentation locations. Prefer documenting attributes in your derive macro's documentation, or in a separate module.
+- Provide a hyperlink to your attributes' documentation on the main documentation page.
+- Describe what container, variant, and field attributes are, and classify each of your attributes.
+
+-----
+
+* Annex: A case study on what NOT to do
+My favourite example of attribute macros done wrong is the now abandoned [[https://crates.io/crates/protocol][protocol]] crate, the goal of which was to easily encode and decode data types to and from binary. For the snippet below, you'll find that there is inconsistent naming of ~discriminant~ and ~discriminator~, inconsistent use of name-value and list metas, and ~#[repr(...)]~ is used to specify the type of the discriminant, which also inadvertently forces a specific in-memory layout of the enum which could be less efficient. A pretty impressive score for a whole 7 lines of code.
+
+#+BEGIN_SRC rust
+#[derive(Protocol)]
+#[protocol(discriminant = "integer")]
+#[repr(u8)]
+enum Enum {
+    #[protocol(discriminator(42))]
+    Variant,
+}
+#+END_SRC
