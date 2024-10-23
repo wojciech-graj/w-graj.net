@@ -4,6 +4,10 @@ pre span.org-builtin {
     font-weight: bold;
 }
 
+pre span.org-doc {
+    color: #036A07;
+}
+
 pre span.org-string {
     color: #008000;
 }
