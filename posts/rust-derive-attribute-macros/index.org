@@ -47,11 +47,11 @@ In cases where one setting consists of a fixed number of parts, such as ~content
 You will also very seldom see any nesting of metas deeper than what's shown in the examples below.
 
 #+BEGIN_SRC rust
-// Path/Lit: boolean toggle
+// Path/Lit
 #[serde_with(skip_apply)] // Lit: boolean toggle (serde_with)
 #[backtrace] // Path: boolean toggle (thiserror)
 
-// NameValue:
+// NameValue
 #[darling(rename = "new_name")] // NameValue: option with arbitrary value (darling)
 #[serde(tag = "t", content = "c")] // NameValue: multiple related values (serde)
 
@@ -86,7 +86,7 @@ It is very common for name-value attributes to have a quoted value, such as ~#[s
 
 This is problematic because it prevents an attribute's value from being a more complex expression. It is therefore common for the value to be provided as a string ~#[attr(three = "1 + 2")]~.
 
-However, with [[https://crates.io/crates/syn][syn 2.0]], parsing a name-value meta with a non-~Lit~ value is now trivial
+However, with [[https://crates.io/crates/syn][syn 2.0]], parsing a name-value meta with a non-[[https://docs.rs/syn/1.0.109/syn/enum.Lit.html][~Lit~]] value is now trivial.
 
 #+BEGIN_SRC rust
 use syn::{parse_quote, Expr, ItemStruct};
