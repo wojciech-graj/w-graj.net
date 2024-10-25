@@ -33,6 +33,7 @@ __attribute__((section(".text#")))main[]={15263113,89<<24,
 - [[https://github.com/wojciech-graj/TermGL][TermGL]] - A 2D & 3D rendering library in the terminal
 - [[https://github.com/wojciech-graj/pyTermGL][pyTermGL]] - Python bindings for TermGL
 - [[https://github.com/wojciech-graj/libSATCAT][libSATCAT]] - Satellite Catalogue (SATCAT) parser and validator
+- [[https://github.com/wojciech-graj/ethertype-rs][ethertype-rs]] - IEEE 802 EtherType values in Rust
 
 ** Games
 - [[https://github.com/wojciech-graj/Wolf-80][Wolf-80]] - A 3D Raycast FPS Game on the TIC-80
