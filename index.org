@@ -22,11 +22,12 @@ __attribute__((section(".text#")))main[]={15263113,89<<24,
 - [[https://github.com/wojciech-graj/C-Raytracer][Raytracer]] - A CPU raytracer from scratch in C
 
 ** The DooM Corner
-- [[https://github.com/wojciech-graj/doom-ascii][doom-ascii]] - DooM in the terminal!
+- [[https://github.com/wojciech-graj/doom-ascii][doom-ascii]] - DooM in the terminal
 - [[https://github.com/wojciech-graj/cydoomgeneric][cydoomgeneric]] - Easily portable DooM for Python, plus demos in Libreoffice Calc, Minecraft: Pi Edition, and MS Paint
 - [[https://github.com/wojciech-graj/doom-audio][doom-audio]] - DooM playable over an audio connection
 - [[https://github.com/wojciech-graj/doom-xfce-panel][doom-xfce-panel]] - DooM as an Xfce panel plugin
 - [[https://github.com/wojciech-graj/doom-xfce-desktop][doom-xfce-desktop]] - DooM playable as icons on an Xfce desktop
+- [[https://github.com/wojciech-graj/DoomValley][DoomValley]] - DooM in Stardew Valley
 
 ** Libraries
 - [[https://github.com/wojciech-graj/bin-proto][bin-proto]] - Simple bit-level protocol definitions in Rust
