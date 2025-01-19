@@ -1,5 +1,5 @@
 ((nil . (
-	 (org-html-postamble . "<p class=\"postamble\">© Wojciech Graj 2024</p>")
+	 (org-html-postamble . "<p class=\"postamble\">© Wojciech Graj 2025</p>")
          (org-html-preamble-format . (("en"
 "<nav>
 <a class=\"name\" href=\"http://w-graj.net\">Wojciech Graj</a>

@@ -28,6 +28,7 @@ __attribute__((section(".text#")))main[]={15263113,89<<24,
 - [[https://github.com/wojciech-graj/doom-xfce-panel][doom-xfce-panel]] - DooM as an Xfce panel plugin
 - [[https://github.com/wojciech-graj/doom-xfce-desktop][doom-xfce-desktop]] - DooM playable as icons on an Xfce desktop
 - [[https://github.com/wojciech-graj/DoomValley][DoomValley]] - DooM in Stardew Valley
+- [[https://github.com/wojciech-graj/doom-docm][doom-docm]] - DooM in a Microsoft Word document
 
 ** Libraries
 - [[https://github.com/wojciech-graj/bin-proto][bin-proto]] - Simple bit-level protocol definitions in Rust
