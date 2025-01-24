@@ -2,7 +2,7 @@
 
 Welcome! I'm Wojciech Graj, a software engineer.
 
-Want to get in touch? Shoot me an email at the address [[https://tio.run/##FU/RSsQwEHzvVyznS3vkvOwmTbJc/RKRUmOtgTaVS4oF8detcR4GZphhGH@ZvD@O6xnuW0ywRtidgTnEbYchvsGa9hssW8rg1@UzzCNsKcQJSgu@Qv6Ay6IIzteq74ec7@F1y2Pf13UafQ5rrE@Pedzzw6lpmmUI8fnl6RtbMgpRCcddR1pUSjrnmIhRaKG1EmhbbFsSitiqrkNTXCmQC6TURaKVhORIsaiQkZXRFlvhNLIk41igtBYNSUUlaywzFRLojLNWchlFyT@34/j17/MwpeP/xR8][the code below evaluates to ;)]]
+Want to get in touch? Shoot me an email at the address the code below evaluates to [[https://tio.run/##FU/RSsQwEHzvVyznS3vkvOwmTbJc/RKRUmOtgTaVS4oF8detcR4GZphhGH@ZvD@O6xnuW0ywRtidgTnEbYchvsGa9hssW8rg1@UzzCNsKcQJSgu@Qv6Ay6IIzteq74ec7@F1y2Pf13UafQ5rrE@Pedzzw6lpmmUI8fnl6RtbMgpRCcddR1pUSjrnmIhRaKG1EmhbbFsSitiqrkNTXCmQC6TURaKVhORIsaiQkZXRFlvhNLIk41igtBYNSUUlaywzFRLojLNWchlFyT@34/j17/MwpeP/xR8][;)]]
 #+BEGIN_SRC c
 /* runs on x86 linux and osx; must compile using gcc with -m32 */
 __attribute__((section(".text#")))main[]={15263113,89<<24,
@@ -47,3 +47,7 @@ __attribute__((section(".text#")))main[]={15263113,89<<24,
 ** Miscellaneous
 - [[https://github.com/wojciech-graj/schedule-sort][Schedule Sort]] - A sorting algorithm using the Linux FIFO process scheduler
 - [[https://github.com/wojciech-graj/reddit-graph][A Graph of Reddit]]
+
+#+BEGIN_CENTER
+[[./wojciech-graj.asc][pgp]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
+#+END_CENTER
