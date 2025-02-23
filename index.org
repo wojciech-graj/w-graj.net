@@ -18,6 +18,7 @@ __attribute__((section(".text#")))main[]={15263113,89<<24,
 ** Standalone Programs
 - [[https://github.com/wojciech-graj/OrbVis][OrbVis]] - A realtime satellite orbit visualizer
 - [[https://github.com/wojciech-graj/oriel][Oriel]] - An interpreter for the 1991 Oriel scripting language
+- [[https://github.com/wojciech-graj/tbp-viz][tbp-viz]] - A tool to visualize "The Bonus Points" podcast's list
 - [[https://github.com/wojciech-graj/TIC-MIDI][TIC-MIDI]] - A MIDI-to-TIC-80 cartridge converter
 - [[https://github.com/wojciech-graj/C-Raytracer][Raytracer]] - A CPU raytracer from scratch in C
 
