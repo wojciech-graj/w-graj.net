@@ -4,7 +4,7 @@ Welcome! I'm Wojciech Graj, a software engineer.
 
 Want to get in touch? Shoot me an email at the address the code below evaluates to [[https://tio.run/##HchLCsIwEADQvceomwSi5D9TrCcRCemkShZW0BEC4tkjuns82l2Jek8pMz/q/OIlJSGeC3G9r2LY89J4O0gpb7mup/PxrdvFBSwelUE/TdarjVG6lTkT4KhM@J9uMcRCTocfwRYArxUAgnVxRAXRovH2c@j9Cw][;)]]
 #+BEGIN_SRC c
-/* compile with gcc on x64 linux */
+/* compile with gcc on x64 linux with the -ansi flag */
 __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 1,0xdbac789,15<<24,0x656dc305,0x672d7740,778723698,7628142};
 #+END_SRC
