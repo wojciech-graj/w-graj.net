@@ -379,14 +379,30 @@ body {
 }
 #content { max-width: unset; }
 #postamble p, #preamble p {
-    text-align: center;
+  text-align: center;
 }
 .github-mark {
-    height: 24px;
-    float: right;
+  height: 24px;
+  float: right;
 }
 .name {
-    font-size: 24px;
-    text-decoration: none;
-    color: inherit;
+  font-size: 24px;
+  text-decoration: none;
+  color: inherit;
+}
+table {
+  margin-left: auto;
+  margin-right: auto;
+}
+.table-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  margin: 1em 0;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
 }

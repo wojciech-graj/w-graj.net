@@ -10,6 +10,7 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 #+END_SRC
 
 * Posts
+- [[./posts/roman-numeral-efficiency][[2025-05-26] How Efficient are Roman Numerals?]]
 - [[./posts/rust-derive-attribute-macros][[2024-10-23] Best Practices for Derive Macro Attributes in Rust]]
 - [[./posts/rust-async-task-graph/][[2024-08-24] Executing Graphs of Asynchronous Tasks in Rust]]
 
@@ -49,5 +50,5 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 - [[https://github.com/wojciech-graj/reddit-graph][A Graph of Reddit]]
 
 #+BEGIN_CENTER
-[[./w-graj.asc][pgp]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
+[[./w-graj.asc][pgp]] | [[./cv.pdf][cv]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
 #+END_CENTER
