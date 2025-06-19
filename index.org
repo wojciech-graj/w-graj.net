@@ -49,6 +49,9 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 - [[https://github.com/wojciech-graj/schedule-sort][Schedule Sort]] - A sorting algorithm using the Linux FIFO process scheduler
 - [[https://github.com/wojciech-graj/reddit-graph][A Graph of Reddit]]
 
+* Publications
+- [[https://resolver.tudelft.nl/uuid:67d109a8-e7b6-45eb-995c-f2cf8851ac69][[2025] Dependency Families in the Maven Ecosystem: An Analysis of Software Dependency Graphs]]
+
 #+BEGIN_CENTER
 [[./w-graj.asc][pgp]] | [[./cv.pdf][cv]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
 #+END_CENTER
