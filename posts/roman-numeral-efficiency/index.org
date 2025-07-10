@@ -1,5 +1,5 @@
 #+TITLE: How Efficient are Roman Numerals?
-#+DATE: 2025-05-26
+#+DATE: 2025-07-10
 #+BIBLIOGRAPHY: references.bib
 #+CITE_EXPORT: csl ../../ieee.csl
 
@@ -18,59 +18,62 @@ Egyptian numerals, dating back to around 3000 BC, belong to the simplest systems
 
 #+CAPTION: Egyptian numerals
 #+ATTR_HTML: :border 2 :rules all :frame border
-| <l>        | <c> | <c> | <c> |   <c> |    <c> |     <c> |       <c> |
-| Value      |   1 |  10 | 100 | 1,000 | 10,000 | 100,000 | 1,000,000 |
+| <l>        | <c> | <c> | <c> |  <c>  |  <c>   |   <c>   |    <c>    |
+| Value      |  1  | 10  | 100 | 1 000 | 10 000 | 100 000 | 1 000 000 |
 |------------+-----+-----+-----+-------+--------+---------+-----------|
-| Hieroglyph |   𓏤 |   𓎆 |   𓍢 |     𓆼 |      𓂭 |      𓆐 |        𓁨 |
+| Hieroglyph |  𓏤  |  𓎆  |  𓍢  |   𓆼   |   𓂭    |   𓆐    |    𓁨     |
 
 Etruscan numerals, a system that some scholars believe to be a precursor to Roman numerals, is based around the same idea, but uses the following symbols [cite:@Etruscan].
 
 #+CAPTION: Etruscan numerals
 #+ATTR_HTML: :border 2 :rules all :frame border
 | <l>   | <c> | <c> | <c> | <c> | <c> |
-| Value |   1 |   5 |  10 |  50 | 100 |
+| Value |  1  |  5  | 10  | 50  | 100 |
 |-------+-----+-----+-----+-----+-----|
-| Digit |   𐌠 |   𐌡 |   𐌢 |   𐌣 |   𐌟 |
+| Digit |  𐌠  | 𐌡  | 𐌢  | 𐌣  | 𐌟  |
 
 ** Greek Numerals
-Greek Numerals, likely dating back to around the 5^{th} century BC, use a unique letter for each base-10 digit in each unique position. This allows every 1-digit number to be expressed with one letter, every 2-digit number with 2 letters, and so forth. Greek numerals have symbols up to 900,000, allowing all 6 digit decimal numbers to be represented [cite:@Greek]. For example, $\text{ΔʹϞʹ}=4+90=94$.
+Greek Numerals, likely dating back to around the 5^{th} century BC, use a unique letter for each base-10 digit in each unique position. This allows every 1-digit number to be expressed with one letter, every 2-digit number with 2 letters, and so forth. Greek numerals have symbols up to 900 000, allowing all 6 digit decimal numbers to be represented [cite:@Greek]. For example, $\text{ΔʹϞʹ}=4+90=94$.
 
 #+CAPTION: Greek numerals
 #+ATTR_HTML: :border 2 :rules all :frame border
-| <l>   | <c> | <c> | <c> | <c> | <c> |    <c> | <c> | <c> | <c> | <c> | <c> | <c> | <c> | <c> | <c> |    | <c> | <c> |
-| Value |   1 |   2 |   3 |   4 |   5 |      6 |   7 |   8 |   9 |  10 |  20 |  30 |  40 |  50 |  60 | 70 |  80 |  90 |
+| <l>   | <c> | <c> | <c> | <c> | <c> |  <c>   | <c> | <c> | <c> | <c> | <c> | <c> | <c> | <c> | <c> |    | <c> | <c> |
+| Value |  1  |  2  |  3  |  4  |  5  |   6    |  7  |  8  |  9  | 10  | 20  | 30  | 40  | 50  | 60  | 70 | 80  | 90  |
 |-------+-----+-----+-----+-----+-----+--------+-----+-----+-----+-----+-----+-----+-----+-----+-----+----+-----+-----|
-| Digit |  Αʹ |  Βʹ |  Γʹ |  Δʹ |  Εʹ | Ϛʹ, ΣΤʹ |  Ζʹ |  Ηʹ |  Θʹ |   Ιʹ |  Κʹ |  Λʹ |  Μʹ |  Νʹ |  Ξʹ | Οʹ |  Πʹ |  Ϟʹ |
+| Digit | Αʹ  | Βʹ  | Γʹ  | Δʹ  | Εʹ  | Ϛʹ, ΣΤʹ | Ζʹ  | Ηʹ  | Θʹ  |  Ιʹ  | Κʹ  | Λʹ  | Μʹ  | Νʹ  | Ξʹ  | Οʹ | Πʹ  | Ϟʹ  |
 
 Many other numeral systems operate on the same principle, including the Abjad, Armenian, Cyrillic, Coptic, Glagotic, and Gothic numeral systems, which all differ in the number of decimal digits they can express, and their alphabet. [cite:@Chrisomalis_2010]
+
+*** Ethiopic Numerals
+Ethiopic numerals are similar to Greek numerals, but express numbers $\geq200$ differently, as the number is split into powers of 100. For example, 375 is written ፫፻፸፭ ($3\times100+70+5$), and 12345 is ፼፳፫፻፵፭ ($10000+\left(20+3\right)\times100+40+5$).
 
 ** Roman Numerals
 Roman numerals operate similarly to Egyptian numerals, but try to minimize the number of characters used to represent numbers, by replacing patterns in which a digit is repeated fourfold with a shorter sequence. For example, $\text{IIII}$ becomes $\text{IV}$, and $\text{VIIII}$ becomes $\text{IX}$.
 
 #+CAPTION: Roman numerals
 #+ATTR_HTML: :border 2 :rules all :frame border
-| <l>   | <c> | <c> | <c> | <c> | <c> | <c> | <c>   |
-| Value |   1 |   5 |  10 |  50 | 100 | 500 | 1,000 |
+| <l>   | <c> | <c> | <c> | <c> | <c> | <c> |  <c>  |
+| Value |  1  |  5  | 10  | 50  | 100 | 500 | 1 000 |
 |-------+-----+-----+-----+-----+-----+-----+-------|
-| Digit |   I |   V |   X |   L |   C |   D | M     |
+| Digit |  I  |  V  |  X  |  L  |  C  |  D  |   M   |
 
-Roman numerals use a concise set of digits, and as such, are unable to express larger numbers. The $\text{M}$ digit was introduced in the middle ages to allow for numbers up to 3999, but ancient Romans were limited to 899 [cite:@Chrisomalis_2010, pp. 102-109]. A few methods arose to tackle this limitation.
+Roman numerals use a concise set of digits, and as such, are unable to express larger numbers. The $\text{M}$ digit was introduced in the middle ages to allow for numbers up to 3 999, but ancient Romans were limited to 899 [cite:@Chrisomalis_2010, pp. 102-109]. A few methods arose to tackle this limitation.
 
 *** Apostrophus
 The Apostrophus method is based on adding more digits and digit combinations to denote larger numbers, and has origins in the Etruscan numeral system [cite:@RomanApostrophus]. The legibility of large numbers is significantly hampered by the complexity of the larger digits.
 
 #+CAPTION: Roman numerals (Apostrophus)
 #+ATTR_HTML: :border 2 :rules all :frame border
-| <l>             | <c> | <c> | <c> | <c> | <c> | <c> |      <c> |   <c> |    <c> |    <c> |     <c> |
-| Value           |   1 |   5 |  10 |  50 | 100 | 500 |    1,000 | 5,000 | 10,000 | 50,000 | 100,000 |
-|-----------------+-----+-----+-----+-----+-----+-----+----------+-------+--------+--------+---------|
-| Digit           |   I |   V |   X |   L |   C |  IↃ |      CIↃ |   IↃↃ |  CCIↃↃ |   IↃↃↃ | CCCIↃↃↃ |
-| Digit (Compact) |   I |   V |   X |   L |   C |   D | ↀ[fn:1] |    ↁ |     ↂ |     ↇ |      ↈ |
+| <l>             | <c> | <c> | <c> | <c> | <c> | <c> |   <c>    |  <c>  |  <c>   |  <c>   |   <c>    |
+| Value           |  1  |  5  | 10  | 50  | 100 | 500 |  1 000   | 5 000 | 10 000 | 50 000 | 100 000  |
+|-----------------+-----+-----+-----+-----+-----+-----+----------+-------+--------+--------+----------|
+| Digit           |  I  |  V  |  X  |  L  |  C  | IↃ |   CIↃ   | IↃↃ  | CCIↃↃ | IↃↃↃ  | CCCIↃↃↃ |
+| Digit (Compact) |  I  |  V  |  X  |  L  |  C  |  D  | ↀ[fn:1] |  ↁ   |   ↂ   |   ↇ   |    ↈ    |
 
 [fn:1] Some speculate that John Wallis, in introducing the symbol for infinity (∞), was inspired by ↀ, which often represented arbitrary large numbers.
 
 *** Vinculum
-Vinculum avoids adding additional characters by allowing an overline to be added to a subset of the digits, to denote that their values should be multiplied by 1,000 [cite:@Ifrah]. For example, $\overline{\text{XII}}=12\cdot1000=12000$, and $\overline{\text{I}}\text{I}=1\cdot1000+1=1001$.
+Vinculum avoids adding additional characters by allowing an overline to be added to a subset of the digits, to denote that their values should be multiplied by 1 000 [cite:@Ifrah]. For example, $\overline{\text{XII}}=12\cdot1000=12000$, and $\overline{\text{I}}\text{I}=1\cdot1000+1=1001$.
 
 * The Efficiency Metric
 While comparing the number of digits in various numbers across the various non-decimal numeral systems, this metric is biased favorably towards systems that have a large alphabet, since you can generally express more information in fewer digits with a larger alphabet. As such, we introduce an information-theoretic efficiency metric $E_\textbf{N}(n)$ for alphabet $\textbf{N}$ and number $n$.
@@ -116,18 +119,19 @@ Figure [[fig:cml1000000]] shows the average length of numbers in digits in the v
 
 #+CAPTION: Shortest numeral systems for uniform numbers up to maximum
 #+ATTR_HTML: :border 2 :rules all :frame border
-|             <r> | <l>                                      |
-|     Maximum $n$ | Best Mean Length                         |
-|-----------------+------------------------------------------|
-|             999 | Gothic, Greek, Cyrillic, Abjad, Armenian |
-|           1,999 | Greek, Cyrillic, Abjad, Armenian         |
-|         999,999 | Greek, Cyrillic, Armenian                |
-|      99,999,999 | Cyrillic, Armenian                       |
-| 999,999,999,999 | Cyrillic                                 |
+|             <r> | <l>                                                |
+|     Maximum $n$ | Best Mean Length                                   |
+|-----------------+----------------------------------------------------|
+|             199 | Gothic, Greek, Cyrillic, Abjad, Armenian, Ethiopic |
+|             999 | Gothic, Greek, Cyrillic, Abjad, Armenian           |
+|           1 999 | Greek, Cyrillic, Abjad, Armenian                   |
+|         999 999 | Greek, Cyrillic, Armenian                          |
+|      99 999 999 | Cyrillic, Armenian                                 |
+| 999 999 999 999 | Cyrillic                                           |
 
 ** Efficiency
 
-Figure [[fig:cme1000000]] shows the average efficiency of the various numeral systems for values $\leq1000000$. As with the previous graph, note that the x axis is non-linear. Various systems trade blows for numbers up to 228, after which the Abjad and Gothic are equally efficient until their domains end at 1,999 and 999 respectively. The Roman system is most efficient between 2,000 and 3,999, followed by Greek, and the various Greek-based systems with a larger domain. It's interesting to note that the efficiency of the decimal system tends to 1, while the non-positional systems all either plateau or exhaust their domain before being able to do so.
+Figure [[fig:cme1000000]] shows the average efficiency of the various numeral systems for values $\leq1000000$. As with the previous graph, note that the x axis is non-linear. Various systems trade blows for numbers up to 19, after which the Ethiopic system takes the lead until 999, after which the Gothic, Abjad, and Roman systems all have their time in the spotlight. At 2 789 the Ethiopic system becomes most efficient, leading until 19 306. It's interesting to note that the efficiency of the decimal system tends to 1, while the non-positional systems all either plateau or exhaust their domain before being able to do so.
 
 #+CAPTION: Mean Efficiency of All Numbers Less than $n$ for $n\leq1000000$
 #+NAME: fig:cme1000000
@@ -139,22 +143,17 @@ Figure [[fig:cme1000000]] shows the average efficiency of the various numeral sy
 |     Maximum $n$ | Best Mean Efficiency |
 |-----------------+----------------------|
 |              19 | Various              |
-|              29 | Etruscan             |
-|             154 | Abjad, Gothic        |
-|             187 | Roman (Apostrophus)  |
-|             190 | Abjad, Gothic        |
-|             207 | Roman (Apostrophus)  |
-|             210 | Abjad, Gothic        |
-|             228 | Roman (Apostrophus)  |
-|             999 | Abjad, Gothic        |
-|           1,999 | Abjad                |
-|           3,999 | Roman                |
-|         999,999 | Greek                |
-|      99,999,999 | Armenian             |
-| 999,999,999,999 | Cyrillic             |
+|             306 | Ethiopic             |
+|             999 | Gothic               |
+|           1 999 | Abjad                |
+|           2 788 | Roman                |
+|          19 306 | Ethiopic             |
+|         999 999 | Greek                |
+|      99 999 999 | Armenian             |
+| 999 999 999 999 | Cyrillic             |
 
 * Conclusion
-Are Roman numerals efficient? In short: not particularly. If you're aiming to minimize the length of the number, Greek-based numeral systems consistently outperform Roman numerals, and Roman numerals are only most efficient for ranges of numbers that end between 2,000 and 3,999. But the efficiency of a numeral system is only one measure of its value, and what Roman numerals lack in information-density, they compensate for with their cultural status and visual distinctiveness, exemplified by their continued survival into the present day.
+Are Roman numerals efficient? In short: not particularly. If you're aiming to minimize the length of the number, Greek-based numeral systems consistently outperform Roman numerals, and Roman numerals are only most efficient for ranges of numbers that end between 2 000 and 2 788. But the efficiency of a numeral system is only one measure of its value, and what Roman numerals lack in information-density, they compensate for with their cultural status and visual distinctiveness, exemplified by their continued survival into the present day.
 
 -----
 
@@ -162,7 +161,7 @@ Are Roman numerals efficient? In short: not particularly. If you're aiming to mi
 :PROPERTIES:
 :CUSTOM_ID: sec:annexa
 :END:
-While I tried to cover the most common non-positional numeral systems, I excluded a few due to their complexity. Georgian numerals use a mixture of decimal (base-10) and vigesimal (base-20), while Hebrew numerals employ a Greek-based system until 1,000, at which point they only have digits for 2,000, 5,000, 10,000, 100,000, 1,000,000, etc. Ethiopic Numerals are Greek-based until 100, then have symbols for 100 and 10,000 that multiply the numbers they are next to. Anania Shirakatsi, a 7^{th} century Armenian philosopher invented his own numeral system which manages to have only 12 symbols with the majority of them being for the digits 1-9 by being similar to the Ethiopic system. [cite:@Chrisomalis_2010]
+While I tried to cover the most common non-positional numeral systems, I excluded a few due to their complexity. Hebrew numerals employ a Greek-based system until 1000, at which point they only have digits for 2000, 5 000, 10 000, and 100 000. Anania Shirakatsi, a 7^{th} century Armenian philosopher invented his own numeral system which manages to have only 12 symbols with the majority of them being for the digits 1-9 by being multiplicative-additive like the Ethiopic system. [cite:@Chrisomalis_2010]
 
 Furthermore, Greek and Coptic numerals are identical apart from their differing alphabets, as are Gothic and Glagotic numerals [cite:@Chrisomalis_2010].
 
@@ -170,7 +169,7 @@ Furthermore, Greek and Coptic numerals are identical apart from their differing 
 It is impossible for a numeral system to have a mean efficiency $E_\text{N}>1$, however certain individual values can exceed 1. For example, the Roman L requires 3 bits to represent as a Roman numeral, however its binary representation needs a whole 6 bits, yielding $E_\textbf{R}(50)=\frac{6}{3}=2$. If you expected your dataset to mostly contain 50, you would actually be better off with Roman numerals than with any positional system![fn::Although it goes without saying that a variable-length binary encoding tailored towards the specific dataset will outperform Roman numerals in such a situation. See [[https://en.wikipedia.org/wiki/Huffman_coding][Huffman Coding]].]
 
 * Annex C: The Cyrillic Numeral System
-The Cyrillic system is particularly interesting due to the sheer size of the numbers that can be represented. In the same way that each digit can be multiplied by 1,000 in the Roman Vinculum system, the Cyrillic system has 7 such multipliers, up to 1,000,000,000. Furthermore, there exists a variant of the Cyrillic system (the Greater Count, as opposed to the previously described Lesser Count), where the largest multiplier has a value of $10^{50}$.
+The Cyrillic system is particularly interesting due to the sheer size of the numbers that can be represented. In the same way that each digit can be multiplied by 1 000 in the Roman Vinculum system, the Cyrillic system has 7 such multipliers, up to 1 000 000 000. Furthermore, there exists a variant of the Cyrillic system (the Greater Count, as opposed to the previously described Lesser Count), where the largest multiplier has a value of $10^{50}$.
 
 Even though Western numerals were known in Russia in the 17^{th} century, the Cyrillic numeral system was adequate for the time, and was only replaced in the early 18^{th} century once technical training in mathematics by Western scholars was introduced [cite:@Chrisomalis_2010 pp. 180-182]. Cyrillic numerals appeared on freshly-minted coins until 1725! [cite:@Coins]
 
