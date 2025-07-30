@@ -1,11 +1,6 @@
 ((nil
   .
-  ((org-html-postamble
-    .
-    "<p class=\"postamble\">
-© Wojciech Graj 2025<br>
-See <a href=\"/license\">LICENSE</a> for copying conditions.
-</p>")
+  ((org-html-postamble . nil)
    (org-html-preamble-format
     .
     (("en"
