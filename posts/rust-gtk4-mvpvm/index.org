@@ -1,0 +1,262 @@
+#+TITLE: Structuring a Gtk4 Rust App
+#+DATE: 2026-01-16
+
+Gtk4, while originally a C toolkit, features high-quality Rust bindings that make it one of the more mature options in Rust’s evolving GUI space. While the Rust bindings are fairly pleasant to use, there is no consensus or guidance on how to actually use them to create a well-architected program. As such, this article will present an approach that has served me well in creating a clean and extensible GUI app. A git repository with a template can be found [[https://github.com/wojciech-graj/gtk4-rust-template][here]].
+
+* The MVPVM architecture
+Every good application needs a good architecture, and despite (or perhaps due to) its diabolical name, the Model-View-Presenter-ViewModel design pattern is a pretty good one, having been [[https://learn.microsoft.com/en-us/archive/msdn-magazine/2011/december/mvpvm-design-pattern-the-model-view-presenter-viewmodel-design-pattern-for-wpf][pioneered by Microsoft in 2011]] when they still made decent software.
+
+In short, an MVPVM app consists of the following elements:
+- View: A dumb View responsible for displaying and affecting the displayed GUI without any non-trivial logic.
+- ViewModel: A struct containing the View's data, that is dynamically updated by user actions and updates the View whenever it is modified by the Presenter.
+- Presenter: The "glue" between the View and Model. User actions cause the Presenter's handlers to be invoked, that can modify the state of the View or ViewModel, or dispatch tasks to the Model.
+- Model: All business logic. It is called synchronously by the Presenter, and can run asynchronous tasks and alert the Presenter upon their completion. The Model often has to perform ~async~ tasks, and these should be run on a separate tokio runtime to not strain Glib's single-threaded async runtime.
+
+Each page should have its own View, ViewModel, and Presenter, although this could be made more granular if needed.
+
+#+BEGIN_SRC plantuml :file mvpvm.svg
+skinparam componentStyle rectangle
+
+package "Main thread" {
+[View]
+[ViewModel]
+[Presenter]
+}
+
+package "Tokio runtime" {
+[Model]
+}
+
+View <-up-> ViewModel : Data Binding
+Presenter -left-> ViewModel
+Presenter -left-> View
+View -right-> Presenter
+Presenter -right-> Model
+Model .left.> Presenter : async
+#+END_SRC
+
+#+RESULTS:
+[[file:mvpvm.svg]]
+
+* The View
+Gtk4 lets you create widgets programmatically, meaning that we could construct our entire UI in Rust. However this is often a poor idea, as it makes large refactors difficult and introduces a lot of boilerplate. Fortunately, the  [[https://gitlab.gnome.org/jpu/cambalache][cambalache]] tool can be used to design the UI graphically with minimal hassle. The generated XML file can be loaded in Rust, and widgets to which you assigned a unique ID (e.g. ~main_window~ or ~duration_spin_button~) will be accessible from Rust.
+
+#+CAPTION: The UI design in Cambalache
+[[./cambalanche.jpg]]
+
+The View is a dumb struct that is responsible for what's displayed in the GUI. Besides a constructor and a method to connect signals, it should only contain methods that abstract GUI operations that the Presenter would want to perform, such as showing an alert dialog. All UI actions performed by the user are routed directly to the Presenter by using Gtk's ~connect_*~ methods.
+
+Gtk can automatically populate the fields of such structs thanks to their composite templates, but it's very often more hassle than it's worth, especially because Views are meant to be kept very simple.
+
+#+BEGIN_SRC rust
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+pub struct MainView {
+    pub window: ApplicationWindow,
+    pub duration: SpinButton,
+    pub sleep: Button,
+}
+
+impl MainView {
+    pub fn new(builder: &gtk::Builder) -> Self {
+        Self {
+            window: builder.object("main_window").unwrap(),
+            duration: builder.object("duration_spin_button").unwrap(),
+            sleep: builder.object("sleep_button").unwrap(),
+        }
+    }
+
+    pub fn connect_signals(&self, presenter: &Rc<RefCell<MainPresenter>>) {
+        self.sleep.connect_clicked(glib::clone!(
+            #[weak]
+            presenter,
+            move |_| {
+                presenter.borrow().on_sleep_clicked();
+            }
+        ));
+    }
+
+    pub fn success(&self) {
+        self.window.alert("Success", "");
+    }
+}
+#+END_SRC
+
+* The ViewModel
+The ViewModel is responsible for giving you easy access to all of the View's data, that you'd otherwise have to access by calling methods on the widgets themselves. There's a lot of Gtk boilerplate involved, but the important parts are the following. The inner ViewModel struct contains fields for every part of the UI that you want to be able to read/write (in this case, the duration spin button). Then the fields in the ViewModel can be bound to the GUI using ~bind_property~, ensuring they're always synchronized.
+
+#+BEGIN_SRC rust
+mod imp {
+    use std::cell::RefCell;
+
+    use glib::{
+        prelude::ObjectExt,
+        subclass::{object::ObjectImpl, prelude::DerivedObjectProperties, types::ObjectSubclass},
+        Properties,
+    };
+
+    #[derive(Properties, Default)]
+    #[properties(wrapper_type = super::MainViewModel)]
+    pub struct MainViewModel {
+        #[property(get, set)]
+        pub duration: RefCell<u64>,
+    }
+
+    #[glib::object_subclass]
+    impl ObjectSubclass for MainViewModel {
+        const NAME: &'static str = "MainViewModel";
+        type Type = super::MainViewModel;
+
+        fn new() -> Self {
+            Self::default()
+        }
+    }
+
+    #[glib::derived_properties]
+    impl ObjectImpl for MainViewModel {}
+}
+
+glib::wrapper! {
+    pub struct MainViewModel(ObjectSubclass<imp::MainViewModel>);
+}
+
+impl MainViewModel {
+    pub fn new(view: &MainView) -> Self {
+        let this: Self = glib::Object::builder().build();
+
+        this.bind_property("duration", &view.duration, "value")
+            .flags(BindingFlags::SYNC_CREATE | BindingFlags::BIDIRECTIONAL)
+            .build();
+
+        this
+    }
+}
+#+END_SRC
+
+* The Presenter
+The Presenter is the "glue" that coordinates the View and Model. It contains a constructor, a method for handling ~async~ callbacks from the Model, and handlers for user actions that get called by the View. Any business logic is handed off to the Model, which can run asynchronously on the tokio runtime to not block the main thread, as Gtk is single-threaded.
+
+Gtk takes rust's ownership rules very loosely, so you'll notice that the Presenter is stored in an ~Rc<RefCell<_>>~ while the Model is in an ~Arc<Mutex<_>>~. Unless performance proves to be an issue (it won't), just chuck everything that might be used by the Model into an ~Arc<Mutex<_>>~ (since it can run on any thread), and anything that is used only by the View, ViewModel, or Presenter in a ~Rc<RefCell<_>>~.
+
+#+BEGIN_SRC rust
+#[derive(Clone, Debug)]
+pub struct MainPresenter {
+    view_model: MainViewModel,
+    view: MainView,
+    model: Arc<Mutex<Model>>,
+}
+
+impl MainPresenter {
+    pub fn new(view: &MainView, model: Arc<Mutex<Model>>) -> Rc<RefCell<Self>> {
+        let this = Rc::new(RefCell::new(Self {
+            view_model: MainViewModel::new(&view),
+            view: view.clone(),
+            model,
+        }));
+
+        view.connect_signals(&this);
+
+        this
+    }
+
+    pub fn process_event(&self, event: &Event) {
+        match event {
+            Event::Slept => {
+                self.view.success();
+            }
+            _ => {}
+        }
+    }
+
+    pub fn on_sleep_clicked(&self) {
+        let duration = Duration::from_secs(self.view_model.duration());
+        model::spawn!(self.model, async move |model: &mut Model| model.sleep(duration).await);
+    }
+}
+#+END_SRC
+
+* The Model
+The Model is where all of your business logic resides. Since it can run run ~async~ tasks separate from the GUI, it uses a channel to send any results of these ~async~ operations to the Presenter, including errors thanks to the ~model::spawn!~ macro's magic.
+
+#+BEGIN_SRC rust
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum Event {
+    Error(Error),
+    Slept,
+}
+
+#[derive(Clone, Debug)]
+pub struct Model {
+    pub send: mpsc::Sender<Event>,
+}
+
+impl Model {
+    pub const fn new(send: mpsc::Sender<Event>) -> Self {
+        Self { send }
+    }
+
+    pub async fn sleep(&mut self, duration: Duration) -> Result<()> {
+        if duration.as_secs() >= 3 {
+            error!("Duration too long");
+            bail!("Duration too long");
+        }
+        tokio::time::sleep(duration).await;
+        self.send.send(Event::Slept).await?;
+        Ok(())
+    }
+}
+#+END_SRC
+
+* Miscellaneous curios
+** Logging
+Glib provides logging infrastructure that integrates very well with the [[https://crates.io/crates/log][~log~]] crate by providing a [[https://docs.rs/glib/latest/glib/struct.GlibLogger.html][~GlibLogger~]], which routes all of your logs through Glib's logging system.
+
+#+BEGIN_SRC rust
+const LOGGER: GlibLogger =
+    GlibLogger::new(GlibLoggerFormat::Structured, GlibLoggerDomain::CrateTarget);
+log::set_logger(&LOGGER).unwrap();
+#+END_SRC
+
+** The ~model::spawn!~ macro
+As explained earlier, the Model's async tasks should be spawned on a separate tokio runtime instead of using Glib's. Additionally, pretty much any business logic tasks will be fallible, and the errors should be propagated up to the GUI. The ~model::spawn!~ macro can be used to achieve this goal.
+
+#+BEGIN_SRC rust
+macro_rules! spawn {
+    ($model:expr, $f:expr) => {
+        #[allow(clippy::significant_drop_tightening)]
+        $crate::runtime().spawn(glib::clone!(
+            #[strong(rename_to = model)]
+            $model,
+            async move {
+                let mut model = model.lock().await;
+                let Err(e) = ($f)(&mut model).await else {
+                    return;
+                };
+                model.send.send(Event::Error(e)).await.unwrap();
+            }
+        ));
+    };
+}
+#+END_SRC
+
+#+BEGIN_SRC rust
+model::spawn!(self.model, async move |model: &mut Model| model.sleep(duration).await);
+#+END_SRC
+
+** The ~glib::clone~! macro
+The [[https://gtk-rs.org/gtk-rs-core/git/docs/glib/macro.clone.html][~glib::clone!~]] macro should be used extensively throughout Gtk applications because Gtk avoids lifetimes and stores everything in reference-counted heap-allocated containers. As such, we have to avoid causing reference cycles or creating references that live forever, to allow resources to be freed once they're no longer in use.
+
+In the below example ~#[weak]~ is used to specify that the Presenter (an ~Rc<RefCell<MainPresenter>>~) should have a weak reference taken, meaning that the Presenter can be freed even if it is being used here. In that case, the closure will simply not run.
+
+#+BEGIN_SRC rust
+self.sleep.connect_clicked(glib::clone!(
+    #[weak]
+    presenter,
+    move |_| {
+        presenter.borrow().on_sleep_clicked();
+    }
+));
+#+END_SRC
+
+* Conclusion
+As demonstrated in the article, the MVPVM pattern works quite well for Rust Gtk applications, and hopefully shows that Gtk is a viable GUI toolkit for Rust despite the language's ever-improving GUI ecosystem.

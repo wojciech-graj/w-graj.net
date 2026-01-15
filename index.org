@@ -11,8 +11,9 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 
 * Posts
 # - [[./posts/roman-numeral-efficiency][[XXXX-XX-XX] How Efficient are Roman Numerals?]]
+- [[./posts/rust-gtk4-mvpvm][[2026-01-16] Structuring a Gtk4 Rust App]]
 - [[./posts/rust-derive-attribute-macros][[2024-10-23] Best Practices for Derive Macro Attributes in Rust]]
-- [[./posts/rust-async-task-graph/][[2024-08-24] Executing Graphs of Asynchronous Tasks in Rust]]
+- [[./posts/rust-async-task-graph][[2024-08-24] Executing Graphs of Asynchronous Tasks in Rust]]
 
 * Projects
 ** Standalone Programs
