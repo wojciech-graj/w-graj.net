@@ -42,7 +42,7 @@ Model .left.> Presenter : async
 Gtk4 lets you create widgets programmatically, meaning that we could construct our entire UI in Rust. However this is often a poor idea, as it makes large refactors difficult and introduces a lot of boilerplate. Fortunately, the  [[https://gitlab.gnome.org/jpu/cambalache][cambalache]] tool can be used to design the UI graphically with minimal hassle. The generated XML file can be loaded in Rust, and widgets to which you assigned a unique ID (e.g. ~main_window~ or ~duration_spin_button~) will be accessible from Rust.
 
 #+CAPTION: The UI design in Cambalache
-[[./cambalanche.jpg]]
+[[./cambalache.jpg]]
 
 The View is a dumb struct that is responsible for what's displayed in the GUI. Besides a constructor and a method to connect signals, it should only contain methods that abstract GUI operations that the Presenter would want to perform, such as showing an alert dialog. All UI actions performed by the user are routed directly to the Presenter by using Gtk's ~connect_*~ methods.
 
