@@ -6,7 +6,7 @@
 Roman numerals are among the oldest numeral systems, and are arguably the oldest system that still sees widespread contemporary use. But how efficient is it compared to our modern positional systems, like the decimal system that almost everyone uses on a daily basis? And how does it stack up against other ancient numeral systems?
 
 * Historical Context
-Virtually all modern numeral systems are positional, meaning that the position of every digit within the number dictates the power to which it is raised. Positional systems can be distinguished by their base, or how many distinct values each digit can have. The decimal system has a base of 10 (0-9), while binary has a base of 2 (0, 1). Positional numerical systems have a history dating back to Babylonia, where a base-60 system was invented around 2000 BCE [cite:@Chrisomalis_2010 p. 247]. However, positional systems didn't get a proper foothold until the invention of the Indian decimal system around the 1^{th}-4^{th} century, and its spread to the Islamic world in the 9^{th} century [cite:@Brezina_2006], and medieval Europe in the 13^{th} century [cite:@FiguringOut].
+Virtually all modern numeral systems are positional, meaning that the position of every digit within the number dictates the power to which it is raised. Positional systems can be distinguished by their base, or how many distinct values each digit can have. The decimal system has a base of 10 (0-9), while binary has a base of 2 (0, 1). Positional numerical systems have a history dating back to Babylonia, where a base-60 system was invented around 2000 BCE [cite:@Chrisomalis_2010 p. 247]. However, positional systems didn't get a proper foothold until the invention of the Indian decimal system around the 1^{st}-4^{th} century, and its spread to the Islamic world in the 9^{th} century [cite:@Brezina_2006], and medieval Europe in the 13^{th} century [cite:@FiguringOut].
 
 Non-positional systems were the dominant numeral systems in antiquity, and were used by civilizations ranging from the Greeks or Romans, to the Etruscans and Armenians. In non-positional systems, the absolute position of digits in numbers doesn't influence their value, although the relative positions of digits can still be relevant ($\text{IV}\neq\text{VI}$ in Roman numerals).
 
@@ -60,7 +60,7 @@ Roman numerals operate similarly to Egyptian numerals, but try to minimize the n
 Roman numerals use a concise set of digits, and as such, are unable to express larger numbers. The $\text{M}$ digit was introduced in the middle ages to allow for numbers up to 3 999, but ancient Romans were limited to 899 [cite:@Chrisomalis_2010, pp. 102-109]. A few methods arose to tackle this limitation.
 
 *** Apostrophus
-The Apostrophus method is based on adding more digits and digit combinations to denote larger numbers, and has origins in the Etruscan numeral system [cite:@RomanApostrophus]. The legibility of large numbers is significantly hampered by the complexity of the larger digits.
+The Apostrophus system is based on adding more digits and digit combinations to denote larger numbers, and has origins in the Etruscan numeral system [cite:@RomanApostrophus]. The legibility of large numbers is significantly hampered by the complexity of the larger digits.
 
 #+CAPTION: Roman numerals (Apostrophus)
 #+ATTR_HTML: :border 2 :rules all :frame border
@@ -111,7 +111,7 @@ The length-related metrics will be relevant if your goal is finding the system t
 
 ** Length
 
-Figure [[fig:cml1000000]] shows the average length of numbers in digits in the various numeral systems for values $\leq1000000$. Note that the x axis is non-linear. As can be seen, all Greek-based systems actually outperform the decimal system on average for $n>9$, as they omit 0 digits. All Roman systems produce equally long numbers, apart from the non-compact Apostrophus method as it uses multiple digits to represent larger powers of 10, and are longer than Greek and Decimal systems. Finally, despite its simplicity, the Egyptian system outperforms the far more complex non-compact Roman Apostrophus method in the long run, despite being thousands of years more recent.
+Figure [[fig:cml1000000]] shows the average length of numbers in digits in the various numeral systems for values $\leq1000000$. Note that the x axis is non-linear. As can be seen, all Greek-based systems actually outperform the decimal system on average for $n>9$, as they omit 0 digits. All Roman systems produce equally long numbers, apart from the non-compact Apostrophus method as it uses multiple digits to represent larger powers of 10, and are longer than Greek and Decimal systems. Finally, despite its simplicity, the Egyptian system outperforms the far more complex non-compact Roman Apostrophus method in the long run, despite being thousands of years older.
 
 #+CAPTION: Mean length of all numbers less than $n$ for $n\leq1000000$
 #+NAME: fig:cml1000000
