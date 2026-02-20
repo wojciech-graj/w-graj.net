@@ -406,3 +406,9 @@ img {
   display: block;
   margin: auto;
 }
+.org-src-name {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
