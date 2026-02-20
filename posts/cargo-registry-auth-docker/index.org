@@ -1,0 +1,103 @@
+#+TITLE: Cargo Registry Authentication in Docker Containers
+#+DATE: 2026-02-20
+
+I recently found myself wanting to use a private cargo registry to build something in a docker container, and noticed a lack of resources (apart from [[https://users.rust-lang.org/t/cargo-registry-authentication-within-docker-container/105014][a sad unresolved forum post]]) on how to securely share an authentication token from the host machine into the container, for cargo to use. The straightforward solution is to pass the token as the environment variable ~CARGO_REGISTRIES_<name>_TOKEN~, but this is neither particularly secure nor friction-less, hence we'll use [[https://gitlab.gnome.org/GNOME/libsecret][libsecret]] through D-Bus and assume a Linux host.
+
+* Project config
+
+If using a custom registry, it should be added to the project's ~.cargo/config.toml~, as detailed [[https://doc.rust-lang.org/cargo/reference/registries.html][here]], setting ~credential-provider~ to ~cargo:libsecret~.
+
+#+BEGIN_SRC toml
+[registry.<name>]
+credential-provider = "cargo:libsecret"
+...
+#+END_SRC
+
+Or for the default registry, just use the following.
+
+#+BEGIN_SRC toml
+[registry]
+credential-provider = "cargo:libsecret"
+#+END_SRC
+
+* Host
+
+A password manager with libsecret support should be installed, such as [[https://wiki.gnome.org/Projects/GnomeKeyring][GNOME Keyring]], [[https://apps.kde.org/kwalletmanager5/][KDE Wallet Manager]], or [[https://keepassxc.org/][KeePassXC]].
+
+* Container
+
+*** Building
+
+Install libsecret into your docker image (~libsecret-1.0~ and ~libsecret~ on Debian and Fedora respectively).
+
+In addition to that, you'll need to make sure the D-Bus connection can be established. D-Bus will refuse connections unless the host's and container's users have matching UIDs or the host unsafely relaxes their permissions, meaning that you'll have to modify your container to create a user with the same UID as the host.
+
+If your docker image doesn't support this, you can add the following snippet to it, or consult [[https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user][the Visual Studio docs]] for more details. This is already in-place for all Microsoft-supplied devcontainer images.
+
+#+CAPTION: From https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
+#+BEGIN_SRC dockerfile
+ARG USERNAME=user-name-goes-here
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
+
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+USER $USERNAME
+#+END_SRC
+
+And set the arguments when building your image, unless you're using devcontainers, in which case this is done automatically.
+
+#+BEGIN_SRC sh
+docker image build \
+	--build-arg "USER_UID=$(id -u)" \
+	--build-arg "USER_GID=$(id -g)"
+#+END_SRC
+
+*** Running
+
+Now you can run your image, mounting the host's D-Bus socket and pointing all processes that try to use D-Bus inside the container to the socket. This can be done as follows for devcontainers.
+
+#+BEGIN_SRC json
+{
+    "mounts": [
+        "type=bind,source=${localEnv:XDG_RUNTIME_DIR}/bus,target=/tmp/host-dbus/bus"
+    ],
+    "containerEnv": {
+        "DBUS_SESSION_BUS_ADDRESS": "unix:path=/tmp/host-dbus/bus"
+    }
+}
+#+END_SRC
+
+Or as follows when running the container directly with a docker command.
+
+#+BEGIN_SRC sh
+docker run \
+	--mount "type=bind,source=/run/user/$(id -u)/bus,target=/tmp/host-dbus/bus" \
+	--env "DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/host-dbus/bus"
+	...
+#+END_SRC
+
+* Login
+
+The initial login can be performed either on the host or inside the container by running the following command.
+
+#+BEGIN_SRC sh
+cargo login --registry <name>
+#+END_SRC
+
+* Conclusion
+
+And that's it, no more awkward environment variables, and cargo authentication should [[https://youtu.be/aAwaxTGnkSk][just work]] securely and seamlessly inside your container.
