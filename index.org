@@ -2,7 +2,14 @@
 
 Welcome! I'm Wojciech Graj, a software engineer.
 
-Want to get in touch? Shoot me an email at the address the code below evaluates to [[https://tio.run/##HchLCsIwEADQvceomwSi5D9TrCcRCemkShZW0BEC4tkjuns82l2Jek8pMz/q/OIlJSGeC3G9r2LY89J4O0gpb7mup/PxrdvFBSwelUE/TdarjVG6lTkT4KhM@J9uMcRCTocfwRYArxUAgnVxRAXRovH2c@j9Cw][;)]]
+#+BEGIN_EXPORT html
+<p style="margin-bottom:0;">
+Want to get in touch? Shoot me an email at the address the code below evaluates to <a href="https://tio.run/##HchLCsIwEADQvceomwSi5D9TrCcRCemkShZW0BEC4tkjuns82l2Jek8pMz/q/OIlJSGeC3G9r2LY89J4O0gpb7mup/PxrdvFBSwelUE/TdarjVG6lTkT4KhM@J9uMcRCTocfwRYArxUAgnVxRAXRovH2c@j9Cw">;)</a>.</p>
+<p style="margin-top:0;">
+Or for the less obfuscated version, see my <a href="./cv.pdf">CV</a>.
+</p>
+#+END_EXPORT
+
 #+BEGIN_SRC c
 /* compile with gcc on x64 linux with the -ansi flag */
 __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
@@ -21,7 +28,7 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 - [[https://github.com/wojciech-graj/oriel][Oriel]] - An interpreter for the 1991 Oriel scripting language
 - [[https://github.com/wojciech-graj/tbp-viz][tbp-viz]] - A tool to visualize "The Bonus Points" podcast's list
 - [[https://github.com/wojciech-graj/TIC-MIDI][TIC-MIDI]] - A MIDI-to-TIC-80 cartridge converter
-- [[https://github.com/wojciech-graj/cargo-no-std][cargo-no-std]] - A tool to check if your crate is no_std
+- [[https://github.com/wojciech-graj/cargo-no-std][cargo-no-std]] - A tool to check if your crate is ~no_std~
 - [[https://github.com/wojciech-graj/C-Raytracer][Raytracer]] - A CPU raytracer from scratch in C
 
 ** The DooM Corner
@@ -55,5 +62,5 @@ __attribute__((section(".text#")))main[]={0xf358d48,184<<24,
 - [[https://resolver.tudelft.nl/uuid:67d109a8-e7b6-45eb-995c-f2cf8851ac69][[2025] Dependency Families in the Maven Ecosystem: An Analysis of Software Dependency Graphs]]
 
 #+BEGIN_CENTER
-[[./w-graj.asc][pgp]] | [[./cv.pdf][cv]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
+[[./w-graj.asc][pgp]] | [[https://github.com/wojciech-graj/.emacs.d][.emacs.d]]
 #+END_CENTER
