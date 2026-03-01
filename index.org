@@ -4,7 +4,7 @@ Welcome! I'm Wojciech Graj, a software engineer.
 
 #+BEGIN_EXPORT html
 <p style="margin-bottom:0;">
-Want to get in touch? Shoot me an email at the address the code below evaluates to <a href="https://tio.run/##HchLCsIwEADQvceomwSi5D9TrCcRCemkShZW0BEC4tkjuns82l2Jek8pMz/q/OIlJSGeC3G9r2LY89J4O0gpb7mup/PxrdvFBSwelUE/TdarjVG6lTkT4KhM@J9uMcRCTocfwRYArxUAgnVxRAXRovH2c@j9Cw">;)</a>.</p>
+Want to get in touch? Shoot me an email at the address the code below evaluates to <a href="https://tio.run/##HchLCsIwEADQvceomwSi5D9TrCcRCemkShZW0BEC4tkjuns82l2Jek8pMz/q/OIlJSGeC3G9r2LY89J4O0gpb7mup/PxrdvFBSwelUE/TdarjVG6lTkT4KhM@J9uMcRCTocfwRYArxUAgnVxRAXRovH2c@j9Cw">;)</a></p>
 <p style="margin-top:0;">
 Or for the less obfuscated version, see my <a href="./cv.pdf">CV</a>.
 </p>

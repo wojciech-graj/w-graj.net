@@ -86,7 +86,7 @@ Or as follows when running the container directly with a docker command.
 #+BEGIN_SRC sh
 docker run \
 	--mount "type=bind,source=/run/user/$(id -u)/bus,target=/tmp/host-dbus/bus" \
-	--env "DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/host-dbus/bus"
+	--env "DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/host-dbus/bus" \
 	...
 #+END_SRC
 
