@@ -14,6 +14,7 @@ pre span.org-string {
 
 pre span.org-keyword {
     color: #0000FF;
+    font-weight: bold;
 }
 
 pre span.org-variable-name {
@@ -67,6 +68,10 @@ pre span.org-rust-string-interpolation {
 pre span.org-rust-unsafe {
     color: #ff0000;
     font-weight: bold;
+}
+
+pre span.org-sh-escaped-newline {
+    color: #008000;
 }
 
 /* Default org-mode theme */
