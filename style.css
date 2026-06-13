@@ -711,3 +711,23 @@ img {
 	margin-left: auto;
 	margin-right: auto;
 }
+
+pre.src-c:before {
+	content: 'C';
+}
+
+pre.src-rust:before {
+	content: 'Rust';
+}
+
+pre.src-dockerfile:before {
+	content: 'Dockerfile';
+}
+
+pre.src-json:before {
+	content: 'JSON';
+}
+
+pre.src-toml:before {
+	content: 'TOML';
+}
