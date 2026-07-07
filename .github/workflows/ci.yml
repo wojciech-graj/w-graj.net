@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+      with:
+        path: w-graj.net
+
+    - name: Checkout .emacs.d
+      uses: actions/checkout@v7
+      with:
+        repository: wojciech-graj/.emacs.d
+        path: .emacs.d
+
+    - name: Download PlantUML
+      run: |
+        sudo wget -q https://github.com/plantuml/plantuml/releases/download/v1.2025.4/plantuml-1.2025.4.jar -O /usr/share/java/plantuml-1.2025.4.jar
+        echo "26518e14a3a04100cd76c0d96cab2d1171f36152215edd9790a28d20268200c1 */usr/share/java/plantuml-1.2025.4.jar" | sha256sum --check
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        cat .emacs.d/packages.txt .emacs.d/packages-extra.txt | xargs sudo apt-get install -y --no-install-recommends emacs-nox
+
+    - name: Publish
+      env:
+        WEBSITE_BASE_DIRECTORY: ${{ github.workspace }}/w-graj.net
+        WEBSITE_PUBLISHING_DIRECTORY: ${{ github.workspace }}/out.w-graj.net
+      run: |
+        emacs --batch \
+          --script .emacs.d/init.el \
+          --execute "(setq enable-local-variables :all)" \
+          --execute "(org-publish-project \"website\")"
