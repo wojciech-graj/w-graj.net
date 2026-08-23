@@ -1,5 +1,6 @@
 #+TITLE: How ~no_std~ are ~no_std~ Rust crates really? A survey
 #+DATE: 2026-08-23
+#+OPTIONS: ^:{}
 
 Imagine you're writing some Rust code for an embedded device that, by virtue of not having an operating system, can't have a full standard library in the form of the ~std~ crate. You come across a crate that provides functionality you're needing for your next feature, and it purports to be ~no_std~ compatible. Perhaps it even has an ~std~ feature, which you instinctively disable. Soon enough you've plugged it into your codebase, ~cargo check~ is happy, and you try to cross-compile it for your embedded target. And that's when the compiler, trying to pull in ~std~, informs you that you've been swindled and the crate isn't ~no_std~ compatible after all.
 
@@ -27,13 +28,13 @@ Note that the crates.io categories are hyphenated (~no-std~), whereas the proper
 
 The dataset consists of the newest [[https://semver.org/][SemVer]][fn::Not to be confused with the newest chronological release.] release of each crate belonging to one of the three groups detailed in the previous section, that are not marked as a ~proc-macro~ crate.
 
-To determine whether a crate is ~no_std~, my [[https://github.com/wojciech-graj/cargo-no-std][~cargo-no-std~]] tool was used. ~cargo-no-std~ attempts to build an executable for a target that lacks ~std~ and includes the relevant crate as a dependency. By providing or not providing a global allocator, determining whether the ~alloc~ crate is used is also possible. The crates were built for the [[https://doc.rust-lang.org/rustc/platform-support/x86_64-unknown-none.html][~x86_64-unknown-none~]] target and the ~-soft-float,+sse2~ target features to ensure sufficient floating point support[fn::It could be argued that a target with better float support, such as ~thumbv7m-none-eabihf~, would be a better choice. However, with these flags, floating point operations appeared to compile successfully on x86\_64.].
+To determine whether a crate is ~no_std~, my [[https://github.com/wojciech-graj/cargo-no-std][~cargo-no-std~]] tool was used. ~cargo-no-std~ attempts to build an executable for a target that lacks ~std~ and includes the relevant crate as a dependency. By providing or not providing a global allocator, determining whether the ~alloc~ crate is used is also possible. The crates were built for the [[https://doc.rust-lang.org/rustc/platform-support/x86_64-unknown-none.html][~x86_64-unknown-none~]] target and the ~-soft-float,+sse2~ target features to ensure sufficient floating point support[fn::It could be argued that a target with better float support, such as ~thumbv7m-none-eabihf~, would be a better choice. However, with these flags, floating point operations appeared to compile successfully on x86_64.].
 
 Support for ~no_std~ or ~no_alloc~ is often feature-gated, hence the crates were tested without default features. Although it is most common to have a feature enabling the usage of either ~alloc~ or ~std~, many crates also have features named ~no_std~ or ~no_alloc~, which disable the use of these crates. Thus, the crates were tested with all features containing both of ~no~ and ~std~ when testing for ~no_std~ compatibility, or ~no~ and ~alloc~ or ~no~ and ~std~ in the case of ~no_alloc~.
 
 To give the crates the best possible chances at successful compilation, the nightly toolchain was used, and all failing crates were re-tried with their default features enabled. Additionally, if a crate failed to compile with ~std~, it was automatically ignored.
 
-Finally, common categories of compilation errors were manually identified, and the failures were categorized based on their compilation errors. Certain errors were associated with false negative results, and all crates that encountered any of these errors were categorized as "ignored". For example, this includes all crates that cannot compile on the x86\_64 architecture.
+Finally, common categories of compilation errors were manually identified, and the failures were categorized based on their compilation errors. Certain errors were associated with false negative results, and all crates that encountered any of these errors were categorized as "ignored". For example, this includes all crates that cannot compile on the x86_64 architecture.
 
 This survey is based on a snapshot of crates.io from 2026-06-06. All of the code used to obtain these results can be found [[https://github.com/wojciech-graj/rust-no-std-survey][here]].
 
