@@ -13,11 +13,11 @@ Perhaps my anecdote is overly dramatic, but this is a real problem, and I'd posi
 
 - Among the most downloaded overcategorized crates, many have gone multiple years without a new release, not having had the chance for their compatibility to be fixed.
 
-- The most common causes of incompatibility are the omission of the ~#![no_std]~ attribute, as well as forgetting that certain items that are implicitly imported by the prelude (such as ~Vec~ or ~String~) must be manually imported for ~no_std~.
+- The most common causes of incompatibility are the omission of the ~#![no_std]~ attribute, as well as forgetting that certain items that are implicitly imported by the [[https://doc.rust-lang.org/std/prelude/][prelude]] (such as [[https://doc.rust-lang.org/alloc/vec/struct.Vec.html][~Vec~]] or [[https://doc.rust-lang.org/alloc/string/struct.String.html][~String~]]) must be manually imported for ~no_std~.
 
 * Background
 
-Rust provides four built-in crates, namely ~std~, ~alloc~, ~core~, and ~proc_macro~, the latter of which is irrelevant here. Any target lacking an operating system will lack the ~std~ crate, whereas the ~alloc~ crate can be opted in to or out of depending on whether heap allocation is desired. That decision mostly comes down to whether the target has enough RAM for a heap and how disastrous it would be to panic if it were to fill up. In this article, crates that only use ~core~ and ~alloc~ will be referred to as ~no_std~, whereas the subset of crates that can compile without ~alloc~ will be called ~no_alloc~.[fn::One could also opt out of using the ~core~ crate with the unstable ~#![no_core]~ attribute. But as this is nightly-only, incredibly niche, and difficult to automatically verify, this is not investigated in this survey.]
+Rust provides four built-in crates, namely [[https://doc.rust-lang.org/std/][~std~]], [[https://doc.rust-lang.org/alloc/][~alloc~]], [[https://doc.rust-lang.org/core/][~core~]], and [[https://doc.rust-lang.org/stable/proc_macro/][~proc_macro~]], the latter of which is irrelevant here. Any target lacking an operating system will lack the ~std~ crate, whereas the ~alloc~ crate can be opted in to or out of depending on whether heap allocation is desired. That decision mostly comes down to whether the target has enough RAM for a heap and how disastrous it would be to panic if it were to fill up. In this article, crates that only use ~core~ and ~alloc~ will be referred to as ~no_std~, whereas the subset of crates that can compile without ~alloc~ will be called ~no_alloc~.[fn::One could also opt out of using the ~core~ crate with the unstable ~#![no_core]~ attribute. But as this is nightly-only, incredibly niche, and difficult to automatically verify, this is not investigated in this survey.]
 
 Tangential to this, crates.io allows crate authors to assign categories to their crates, aiding discoverability and giving prospective users some context at a glance. Two of these categories are ~no-std~ and ~no-std::no-alloc~, which correspond to our ~no_std~ and ~no_alloc~ labels respectively. The dataset is split into three groups, namely all crates with the ~no-std::no-alloc~ category, all crates with the ~no-std~ category, and all crates containing the string ~no_std~ in their source code. ~no_std::no_alloc~ is a subset of ~no_std~, which is in turn a subset of the total cohort.
 
@@ -27,7 +27,7 @@ Note that the crates.io categories are hyphenated (~no-std~), whereas the proper
 
 The dataset consists of the newest [[https://semver.org/][SemVer]][fn::Not to be confused with the newest chronological release.] release of each crate belonging to one of the three groups detailed in the previous section, that are not marked as a ~proc-macro~ crate.
 
-To determine whether a crate is ~no_std~, my [[https://github.com/wojciech-graj/cargo-no-std][~cargo-no-std~]] tool was used. ~cargo-no-std~ attempts to build an executable for a target that lacks ~std~ and includes the relevant crate as a dependency. By providing or not providing a global allocator, determining whether the ~alloc~ crate is used is also possible. The crates were built for the ~x86_64-unknown-none~ target and the ~-soft-float,+sse2~ target features to ensure sufficient floating point support[fn::It could be argued that a target with better float support, such as ~thumbv7m-none-eabihf~, would be a better choice. However, with these flags, floating point operations appeared to compile successfully on x86\_64.].
+To determine whether a crate is ~no_std~, my [[https://github.com/wojciech-graj/cargo-no-std][~cargo-no-std~]] tool was used. ~cargo-no-std~ attempts to build an executable for a target that lacks ~std~ and includes the relevant crate as a dependency. By providing or not providing a global allocator, determining whether the ~alloc~ crate is used is also possible. The crates were built for the [[https://doc.rust-lang.org/rustc/platform-support/x86_64-unknown-none.html][~x86_64-unknown-none~]] target and the ~-soft-float,+sse2~ target features to ensure sufficient floating point support[fn::It could be argued that a target with better float support, such as ~thumbv7m-none-eabihf~, would be a better choice. However, with these flags, floating point operations appeared to compile successfully on x86\_64.].
 
 Support for ~no_std~ or ~no_alloc~ is often feature-gated, hence the crates were tested without default features. Although it is most common to have a feature enabling the usage of either ~alloc~ or ~std~, many crates also have features named ~no_std~ or ~no_alloc~, which disable the use of these crates. Thus, the crates were tested with all features containing both of ~no~ and ~std~ when testing for ~no_std~ compatibility, or ~no~ and ~alloc~ or ~no~ and ~std~ in the case of ~no_alloc~.
 
@@ -102,7 +102,7 @@ As can be seen, the most common cause of ~no_std~ non-compliance is the mere lac
 | ~static_init~         |   1.0.4 | 11 225 342 |   2025-05-21 | Depends on ~parking_lot_core~ 0.9.12, which lacks ~#![no_std]~.                          |
 | ~fast-float~          |   0.2.0 |  9 724 868 |   2021-01-13 | Lacks ~#![no_std]~.                                                                    |
 | ~tracing-wasm~        |   0.2.1 |  9 609 353 |   2021-11-07 | Lacks ~#![no_std]~.                                                                    |
-| ~palette~             |   0.7.6 |  8 381 955 |   2024-04-28 | Uses ~f32~ methods that are ~std~-only.                                                  |
+| ~palette~             |   0.7.6 |  8 381 955 |   2024-04-28 | Derive macro generates code referencing modules gated behind non-default features.   |
 | ~reqwest-eventsource~ |   0.6.0 |  8 251 792 |   2024-03-29 | Lacks ~#![no_std]~.                                                                    |
 | ~hyperloglogplus~     |   0.4.1 |  5 706 689 |   2022-06-13 | Uses ~std~.                                                                            |
 | ~uuid-rng-internal~   |  1.23.2 |  5 589 159 |   2026-05-29 | Lacks ~#![no_std]~.                                                                    |
@@ -117,9 +117,9 @@ As interesting as the sheer number of crates that are ~no_std~ incompatible are 
 
 The single most common cause of incompatibility is the lack of the ~#![no_std]~ attribute, without which the compiler will add the ~std~ crate as a dependency, accounting for 88.1% of all failures in ~no-std~ categorized crates. Even if these crates do not use any items from the standard library, the mere omission of this attribute renders the crate incompatible.
 
-The second most common issue, occurring in 32.6% of overcategorized crates, is caused by not accounting for the fact that the ~std~ prelude implicitly imports items from the ~alloc~ crate, which otherwise have to be manually imported (for example ~Vec~ or ~String~). The same applies for the third most common issue, but with items from the ~std~ crate. Both of these likely indicate that the crate's author made an effort to be ~no_std~ compliant by searching for and removing all imports from the ~std~ or ~alloc~ crates, without considering that some of these imports are implicit.
+The second most common issue, occurring in 32.6% of overcategorized crates, is caused by not accounting for the fact that the [[https://doc.rust-lang.org/std/prelude/][~std~ prelude]] implicitly imports items from the ~alloc~ crate, which otherwise have to be manually imported (for example [[https://doc.rust-lang.org/alloc/vec/struct.Vec.html][~Vec~]] or [[https://doc.rust-lang.org/alloc/string/struct.String.html][~String~]]). The same applies for the third most common issue, but with items from the ~std~ crate. Both of these likely indicate that the crate's author made an effort to be ~no_std~ compliant by searching for and removing all imports from the ~std~ or ~alloc~ crates, without considering that some of these imports are implicit.
 
-One more interesting cause of failure is related to floating point numbers. Many methods on floating-point types, such as [[https://doc.rust-lang.org/std/primitive.f32.html#method.round][~f32::round~]], are only implemented on ~f32~ in the ~std~ crate, and are only available on ~no_std~ targets through various polyfill crates, like [[https://crates.io/crates/num-traits][~num-traits~]].
+One more interesting cause of failure is related to floating point numbers. Many methods on floating-point types, such as [[https://doc.rust-lang.org/std/primitive.f32.html#method.round][~f32::round~]], are only implemented on ~f32~ in the ~std~ crate, and are only available on ~no_std~ targets through various polyfill crates, like [[https://crates.io/crates/num-traits][~num-traits~]] or [[https://crates.io/crates/libm][~libm~]].
 
 ** Why crates had to be ignored
 
@@ -146,3 +146,9 @@ Hopefully the data presented in this article has convinced you that the miscateg
 There's also the option for some tool like clippy or rustc itself to start emitting warnings if a crate is miscategorized, but implementing that would be a major undertaking, so I'll leave this at a suggestion.
 
 And who knows, maybe in a few years we'll be able to perform this experiment again and discover that crates.io's categories are being used to their fullest!
+
+-----
+
+* Revision history
+*** 2026-08-23
+- Correct failure reason for ~palette~ crate.
