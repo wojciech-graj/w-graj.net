@@ -94,19 +94,19 @@ As can be seen, the most common cause of ~no_std~ non-compliance is the mere lac
 #+CAPTION: Most downloaded ~no-std~ crates that are not ~no_std~
 #+NAME: tab:worst_offenders
 #+ATTR_HTML: :border 2 :rules all :frame border
-| <l>                 |     <r> |        <r> |          <r> | <l>                                                                                  |
-| Crate               | Version |  Downloads | Release date | Reason                                                                               |
-|---------------------+---------+------------+--------------+--------------------------------------------------------------------------------------|
-| ~alloy-primitives~    |   1.6.0 | 21 262 866 |   2026-05-14 | Used incorrect feature flags for ~ctor~ transitive dependency. Fixed as of publishing. |
-| ~multiversion~        |   0.8.0 | 12 186 033 |   2024-12-08 | Lacks ~#![no_std]~.                                                                    |
-| ~human_format~        |   1.2.1 | 11 373 281 |   2026-01-17 | Lacks ~#![no_std]~.                                                                    |
-| ~static_init~         |   1.0.4 | 11 225 342 |   2025-05-21 | Depends on ~parking_lot_core~ 0.9.12, which lacks ~#![no_std]~.                          |
-| ~fast-float~          |   0.2.0 |  9 724 868 |   2021-01-13 | Lacks ~#![no_std]~.                                                                    |
-| ~tracing-wasm~        |   0.2.1 |  9 609 353 |   2021-11-07 | Lacks ~#![no_std]~.                                                                    |
-| ~palette~             |   0.7.6 |  8 381 955 |   2024-04-28 | Derive macro generates code referencing modules gated behind non-default features.   |
-| ~reqwest-eventsource~ |   0.6.0 |  8 251 792 |   2024-03-29 | Lacks ~#![no_std]~.                                                                    |
-| ~hyperloglogplus~     |   0.4.1 |  5 706 689 |   2022-06-13 | Uses ~std~.                                                                            |
-| ~uuid-rng-internal~   |  1.23.2 |  5 589 159 |   2026-05-29 | Lacks ~#![no_std]~.                                                                    |
+| <l>                 |     <r> |        <r> |          <r> | <l>                                                                                              |
+| Crate               | Version |  Downloads | Release date | Reason                                                                                           |
+|---------------------+---------+------------+--------------+--------------------------------------------------------------------------------------------------|
+| ~alloy-primitives~    |   1.6.0 | 21 262 866 |   2026-05-14 | Used incorrect feature flags for ~ctor~ transitive dependency. Fixed as of publishing.             |
+| ~multiversion~        |   0.8.0 | 12 186 033 |   2024-12-08 | Lacks ~#![no_std]~.                                                                                |
+| ~human_format~        |   1.2.1 | 11 373 281 |   2026-01-17 | Lacks ~#![no_std]~.                                                                                |
+| ~static_init~         |   1.0.4 | 11 225 342 |   2025-05-21 | Depends on ~parking_lot_core~ 0.9.12, which lacks ~#![no_std]~.                                      |
+| ~fast-float~          |   0.2.0 |  9 724 868 |   2021-01-13 | Lacks ~#![no_std]~.                                                                                |
+| ~tracing-wasm~        |   0.2.1 |  9 609 353 |   2021-11-07 | Lacks ~#![no_std]~.                                                                                |
+| ~palette~             |   0.7.6 |  8 381 955 |   2024-04-28 | Derive macro generates code referencing items gated behind non-default features. Fixed in 0.7.7. |
+| ~reqwest-eventsource~ |   0.6.0 |  8 251 792 |   2024-03-29 | Lacks ~#![no_std]~.                                                                                |
+| ~hyperloglogplus~     |   0.4.1 |  5 706 689 |   2022-06-13 | Uses ~std~.                                                                                        |
+| ~uuid-rng-internal~   |  1.23.2 |  5 589 159 |   2026-05-29 | Lacks ~#![no_std]~.                                                                                |
 
 ** Why are crates ~no_std~ incompatible?
 
@@ -151,5 +151,7 @@ And who knows, maybe in a few years we'll be able to perform this experiment aga
 -----
 
 * Revision history
+*** 2026-08-24
+- Mention if crates on the worst offenders list have been fixed.
 *** 2026-08-23
 - Correct failure reason for ~palette~ crate.
